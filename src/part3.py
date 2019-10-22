@@ -76,9 +76,8 @@ class CNN(nn.Module):
 
     def __init__(self):
         super().__init__()
-        self.conv1 = nn.Conv2d(in_channels=3, out_channels=10, kernel_size=5, stride=1)
+        self.conv1 = nn.Conv2d(in_channels=1, out_channels=10, kernel_size=5, stride=1)
         self.conv2 = nn.Conv2d(in_channels=10, out_channels=50, kernel_size=5, stride=1)
-        print(self.conv1)
         self.fc1 = nn.Linear(50 * 4 * 4, 256)
         self.fc2 = nn.Linear(256, 10)
 
