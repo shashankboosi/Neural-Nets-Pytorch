@@ -41,6 +41,9 @@ class LinearModel:
         a float, but raises a Value error if a boolean, list or numpy array is passed in
         hint: consider np.exp()
         """
+        if type(x) is bool or list or np.ndarray:
+            raise ValueError('Wrong data type! Please check the input')
+        return 1 / (1 + np.exp(-x))
 
     def forward(self, inputs):
         """
@@ -56,6 +59,7 @@ class LinearModel:
         TODO: Return the cross entropy for the given prediction and label
         hint: consider using np.log()
         """
+        return
 
     @staticmethod
     def error(prediction, label):
@@ -63,8 +67,9 @@ class LinearModel:
         TODO: Return the difference between the label and the prediction
 
         For example, if label= 1 and the prediction was 0.8, return 0.2
-                     if label= 0 and the preduction was 0.43 return -0.43
+                     if label= 0 and the prediction was 0.43 return -0.43
         """
+        return
 
     def backward(self, inputs, diff):
         """
@@ -105,7 +110,7 @@ class LinearModel:
 
 def main():
     inputs, labels = pkl.load(open("../data/binary_classification_data.pkl", "rb"))
-
+    print(labels.shape)
     epochs = 400
     model = LinearModel(num_inputs=inputs.shape[1], learning_rate=0.01)
 
