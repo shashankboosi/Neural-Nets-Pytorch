@@ -65,6 +65,7 @@ def simple_dot_product(x, y):
     TODO: Implement a function that computes the dot product of
         two rank 1 tensors and returns the result.
     """
+    return torch.dot(x, y)
 
 
 def simple_matrix_mul(x, y):
@@ -80,6 +81,7 @@ def broadcastable_matrix_mul(x, y):
     TODO: Implement a function that computes the matrix product of two tensors and returns the result.
         The function needs to be broadcastable.
     """
+    return
 
 
 # Concatenate and stack.
