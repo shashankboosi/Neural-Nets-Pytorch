@@ -13,6 +13,7 @@ DOING SO MAY CAUSE YOUR CODE TO FAIL AUTOMATED TESTING.
 """
 import torch
 
+
 # Simple addition operation
 
 def simple_addition(x, y):
@@ -20,6 +21,7 @@ def simple_addition(x, y):
     TODO: Implement a simple addition function that accepts two tensors and returns the result.
     """
     return torch.add(x, y)
+
 
 # Resize tensors
 # Use view() to implement the following functions ( flatten() and reshape() are not allowed )
@@ -30,11 +32,13 @@ def simple_reshape(x, shape):
     """
     return x.view(shape)
 
+
 def simple_flat(x):
     """
     TODO: Implement a function that flattens the given tensor and returns the result.
     """
     return x.view(torch.numel(x))
+
 
 # Transpose and Permutation
 
@@ -45,11 +49,13 @@ def simple_transpose(x):
     """
     return torch.transpose(x, 0, 1)
 
+
 def simple_permute(x, order):
     """
     TODO: Implement a function that permute the dimensions of the given tensor
         x according to the given order and returns the result.
     """
+    return x.permute(order)
 
 
 # Matrix multiplication (with broadcasting).
@@ -84,10 +90,10 @@ def simple_concatenate(tensors):
     """
     return torch.cat(tensors, 0)
 
+
 def simple_stack(tensors, dim):
     """
     TODO: Implement a function that concatenates the given sequence of tensors
         along a new dimension(dim) and returns the result.
     """
     return torch.stack()
-
