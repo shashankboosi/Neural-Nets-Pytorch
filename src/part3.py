@@ -82,7 +82,6 @@ class CNN(nn.Module):
         self.fc2 = nn.Linear(256, 10)
 
     def forward(self, x):
-        x = x.view(x.shape[0], -1)
 
         x = F.max_pool2d(F.relu(self.conv1(x)), 2)
         x = F.max_pool2d(F.relu(self.conv2(x)), 2)
@@ -204,10 +203,10 @@ def main():
     results = []
 
     # Can comment the below out during development
-    images, labels = NNModel(Linear(), 0.003).view_batch()
-    print(labels)
-    plt.imshow(images, cmap="Greys")
-    plt.show()
+    # images, labels = NNModel(Linear(), 0.003).view_batch()
+    # print(labels)
+    # plt.imshow(images, cmap="Greys")
+    # plt.show()
 
     for model in models:
         print(f"Training {model.__class__.__name__}...")
