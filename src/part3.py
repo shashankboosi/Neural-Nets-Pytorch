@@ -82,7 +82,6 @@ class CNN(nn.Module):
         self.fc2 = nn.Linear(256, 10)
 
     def forward(self, x):
-
         x = F.max_pool2d(F.relu(self.conv1(x)), 2)
         x = F.max_pool2d(F.relu(self.conv2(x)), 2)
         x = x.reshape(x.size(0), -1)
@@ -138,6 +137,10 @@ class NNModel:
 
            2) An int 8x8 numpy array of labels corresponding to this tiling
         """
+        image, label = next(iter(self.trainloader))
+        image_batch = image.reshape(-1, 8, 28, 28).permute(0, 2, 1, 3).reshape(-1, 8 * 28).numpy()
+        label_batch = label.reshape(-1, 8).numpy()
+        return image_batch, label_batch
 
     def train_step(self):
         """
@@ -203,10 +206,10 @@ def main():
     results = []
 
     # Can comment the below out during development
-    # images, labels = NNModel(Linear(), 0.003).view_batch()
-    # print(labels)
-    # plt.imshow(images, cmap="Greys")
-    # plt.show()
+    images, labels = NNModel(Linear(), 0.003).view_batch()
+    print(labels)
+    plt.imshow(images, cmap="Greys")
+    plt.show()
 
     for model in models:
         print(f"Training {model.__class__.__name__}...")
