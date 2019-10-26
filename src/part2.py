@@ -87,14 +87,8 @@ class LinearModel:
 
         Note: Numpy arrays are passed by reference and can be modified in-place
         """
-        if diff > 0:
-            self.weights[0] = self.weights[0] + self.lr * inputs[0]
-            self.weights[1] = self.weights[1] + self.lr * inputs[1]
-            self.weights[2] = self.weights[2] + self.lr
-        else:
-            self.weights[0] = self.weights[0] - self.lr * inputs[0]
-            self.weights[1] = self.weights[1] - self.lr * inputs[1]
-            self.weights[2] = self.weights[2] - self.lr
+        inputs = np.append(inputs, 1)
+        self.weights = self.weights + self.lr * inputs * diff
 
     def plot(self, inputs, marker):
         """
@@ -119,7 +113,7 @@ class LinearModel:
 
 def main():
     inputs, labels = pkl.load(open("../data/binary_classification_data.pkl", "rb"))
-    print(labels.shape)
+
     epochs = 400
     model = LinearModel(num_inputs=inputs.shape[1], learning_rate=0.01)
 
