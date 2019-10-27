@@ -44,6 +44,22 @@ class FeedForward(nn.Module):
     Linear (256) -> ReLU -> Linear(64) -> ReLU -> Linear(10) -> ReLU-> LogSoftmax
     """
 
+    def __init__(self):
+        super().__init__()
+        self.fc1 = nn.Linear(784, 256)
+        self.fc2 = nn.Linear(256, 64)
+        self.fc3 = nn.Linear(64, 10)
+
+    def forward(self, x):
+        x = x.view(x.shape[0], -1)
+
+        x = F.relu(self.fc1(x))
+        x = F.relu(self.fc2(x))
+        x = F.relu(self.fc3(x))
+        x = F.log_softmax(x, dim=1)
+
+        return x
+
 
 class CNN(nn.Module):
     """
@@ -57,6 +73,23 @@ class CNN(nn.Module):
     Hint: You will need to reshape outputs from the last conv layer prior to feeding them into
     the linear layers.
     """
+
+    def __init__(self):
+        super().__init__()
+        self.conv1 = nn.Conv2d(in_channels=1, out_channels=10, kernel_size=5, stride=1)
+        self.conv2 = nn.Conv2d(in_channels=10, out_channels=50, kernel_size=5, stride=1)
+        self.fc1 = nn.Linear(50 * 4 * 4, 256)
+        self.fc2 = nn.Linear(256, 10)
+
+    def forward(self, x):
+        x = F.max_pool2d(F.relu(self.conv1(x)), 2)
+        x = F.max_pool2d(F.relu(self.conv2(x)), 2)
+        x = x.reshape(x.size(0), -1)
+        x = F.relu(self.fc1(x))
+        x = F.log_softmax(self.fc2(x), dim=1)
+
+        return x
+
 
 class NNModel:
     def __init__(self, network, learning_rate):
@@ -86,7 +119,7 @@ class NNModel:
         
         Hint: All networks output log-softmax values (i.e. log probabilities or.. likelihoods.). 
         """
-        self.lossfn = None
+        self.lossfn = nn.NLLLoss()
         self.optimizer = optim.Adam(self.model.parameters(), lr=learning_rate)
 
         self.num_train_samples = len(self.trainloader)
@@ -104,6 +137,10 @@ class NNModel:
 
            2) An int 8x8 numpy array of labels corresponding to this tiling
         """
+        image, label = next(iter(self.trainloader))
+        image_batch = image.reshape(-1, 8, 28, 28).permute(0, 2, 1, 3).reshape(-1, 8 * 28).numpy()
+        label_batch = label.reshape(-1, 8).numpy()
+        return image_batch, label_batch
 
     def train_step(self):
         """

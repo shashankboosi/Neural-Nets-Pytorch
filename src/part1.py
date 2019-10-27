@@ -13,12 +13,14 @@ DOING SO MAY CAUSE YOUR CODE TO FAIL AUTOMATED TESTING.
 """
 import torch
 
+
 # Simple addition operation
 
 def simple_addition(x, y):
     """
     TODO: Implement a simple addition function that accepts two tensors and returns the result.
     """
+    return torch.add(x, y)
 
 
 # Resize tensors
@@ -28,12 +30,14 @@ def simple_reshape(x, shape):
     """
     TODO: Implement a function that reshapes the given tensor as the given shape and returns the result.
     """
+    return x.view(shape)
 
 
 def simple_flat(x):
     """
     TODO: Implement a function that flattens the given tensor and returns the result.
     """
+    return x.view(torch.numel(x))
 
 
 # Transpose and Permutation
@@ -43,6 +47,7 @@ def simple_transpose(x):
     TODO: Implement a function that swaps the first dimension and
         the second dimension of the given matrix x and returns the result.
     """
+    return torch.transpose(x, 0, 1)
 
 
 def simple_permute(x, order):
@@ -50,6 +55,7 @@ def simple_permute(x, order):
     TODO: Implement a function that permute the dimensions of the given tensor
         x according to the given order and returns the result.
     """
+    return x.permute(order)
 
 
 # Matrix multiplication (with broadcasting).
@@ -59,6 +65,7 @@ def simple_dot_product(x, y):
     TODO: Implement a function that computes the dot product of
         two rank 1 tensors and returns the result.
     """
+    return torch.dot(x, y)
 
 
 def simple_matrix_mul(x, y):
@@ -66,6 +73,7 @@ def simple_matrix_mul(x, y):
     TODO: Implement a function that performs a matrix multiplication
         of two given rank 2 tensors and returns the result.
     """
+    return torch.mm(x, y)
 
 
 def broadcastable_matrix_mul(x, y):
@@ -73,6 +81,7 @@ def broadcastable_matrix_mul(x, y):
     TODO: Implement a function that computes the matrix product of two tensors and returns the result.
         The function needs to be broadcastable.
     """
+    return torch.matmul(x, y)
 
 
 # Concatenate and stack.
@@ -81,6 +90,7 @@ def simple_concatenate(tensors):
     TODO: Implement a function that concatenates the given sequence of tensors
         in the first dimension and returns the result
     """
+    return torch.cat(tensors, 0)
 
 
 def simple_stack(tensors, dim):
@@ -88,5 +98,4 @@ def simple_stack(tensors, dim):
     TODO: Implement a function that concatenates the given sequence of tensors
         along a new dimension(dim) and returns the result.
     """
-
-
+    return torch.stack(tensors, dim)
