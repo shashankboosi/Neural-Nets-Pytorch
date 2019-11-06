@@ -1,15 +1,9 @@
 #!/usr/bin/env python3
 """
-part2.py
+perceptron.py
 
-UNSW COMP9444 Neural Networks and Deep Learning
+Perceptron from scratch built using numpy
 
-ONLY COMPLETE METHODS AND CLASSES MARKED "TODO".
-
-DO NOT MODIFY IMPORTS. DO NOT ADD EXTRA FUNCTIONS.
-DO NOT MODIFY EXISTING FUNCTION SIGNATURES.
-DO NOT IMPORT ADDITIONAL LIBRARIES.
-DOING SO MAY CAUSE YOUR CODE TO FAIL AUTOMATED TESTING.
 """
 import numpy as np
 import pickle as pkl
@@ -19,8 +13,8 @@ import matplotlib.pyplot as plt
 class LinearModel:
     def __init__(self, num_inputs, learning_rate):
         """
-        Model is very similar to the Perceptron shown in Lectures 1c, slide 12, except that:
-        (1) the bias is indexed by w(n+1) rather than w(0), and
+        Model is very similar to the Perceptron
+        1) the bias is indexed by w(n+1) rather than w(0), and
         (2) the activation function is a (continuous) sigmoid rather than a (discrete) step function.
 
         x1 ----> * w1 ----\
@@ -33,13 +27,12 @@ class LinearModel:
         """
         self.num_inputs = num_inputs
         self.lr = learning_rate
-        self.weights = np.asarray([1.0, -1.0, 0.0])  # Initialize as straight line
+        self.weights = np.asarray([1.0, -1.0, 0.0])
 
     def activation(self, x):
         """
-        TODO: Implement a sigmoid activation function that accepts a float and returns
-        a float, but raises a Value error if a boolean, list or numpy array is passed in
-        hint: consider np.exp()
+        Sigmoid activation function that accepts a float and returns
+        Raises a Value error if a boolean, list or numpy array is passed in
         """
         if type(x) is bool or type(x) is list or type(x) is np.ndarray:
             raise ValueError('Wrong data type! Please check the input')
@@ -47,26 +40,21 @@ class LinearModel:
 
     def forward(self, inputs):
         """
-        TODO: Implement the forward pass (inference) of a the model.
-
-        inputs is a numpy array. The bias term is the last element in self.weights.
-        hint: call the activation function you have implemented above.
+        Inputs a numpy array. The bias term is the last element in self.weights.
         """
         return self.activation(self.weights[0] * inputs[0] + self.weights[1] * inputs[1] + self.weights[2])
 
     @staticmethod
     def loss(prediction, label):
         """
-        TODO: Return the cross entropy for the given prediction and label
-        hint: consider using np.log()
+        Cross entropy loss for the given prediction and label
         """
         return - (label * np.log(prediction) + (1 - label) * np.log(1 - prediction))
 
     @staticmethod
     def error(prediction, label):
         """
-        TODO: Return the difference between the label and the prediction
-
+        Error between the label and the prediction
         For example, if label= 1 and the prediction was 0.8, return 0.2
                      if label= 0 and the prediction was 0.43 return -0.43
         """
@@ -74,18 +62,16 @@ class LinearModel:
 
     def backward(self, inputs, diff):
         """
-        TODO: Adjust self.weights by gradient descent
+        Gradient descent
 
-        We take advantage of the simplification shown in Lecture 2b, slide 23,
-        to compute the gradient directly from the differential or difference
-        dE/ds = z - t (which is passed in as diff)
+        We take advantage of the simplification to compute the gradient
+        directly from the differential or difference dE/ds = z - t
+        (which is passed in as diff)
 
         The resulting weight update should look essentially the same as for the
-        Perceptron Learning Rule (shown in Lectures 1c, slide 11) except that
+        Perceptron Learning Rule except that
         the error can take on any continuous value between -1 and +1,
         rather than being restricted to the integer values -1, 0 or +1.
-
-        Note: Numpy arrays are passed by reference and can be modified in-place
         """
         inputs = np.append(inputs, 1)
         self.weights = self.weights + self.lr * inputs * diff

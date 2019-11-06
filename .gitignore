@@ -92,6 +92,7 @@ venv.bak/
 
 # IntelliJ
 .idea/
+data/KMNIST/
 
 # Spyder project settings
 .spyderproject
