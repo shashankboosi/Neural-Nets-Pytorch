@@ -147,7 +147,7 @@ def plot_result(results, names):
     plt.ylabel("Test accuracy")
     plt.grid(True)
     plt.tight_layout()
-    plt.savefig("./part_2_plot.png")
+    plt.savefig("../Images/epoch_to_accuracy.png")
     plt.show()
 
 
