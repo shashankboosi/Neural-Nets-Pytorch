@@ -40,6 +40,9 @@ class NetworkLstm(tnn.Module):
         TODO:
         Create and initialise weights and biases for the layers.
         """
+        self.lstm = tnn.LSTM(input_size=50, hidden_size=100, batch_first=True)
+        self.fc1 = tnn.Linear(in_features=100, out_features=64)
+        self.fc2 = tnn.Linear(in_features=64, out_features=1)
 
     def forward(self, input, length):
         """
@@ -47,6 +50,14 @@ class NetworkLstm(tnn.Module):
         TODO:
         Create the forward pass through the network.
         """
+        h0 = torch.zeros(1, length, 100)  # [num_of_layers, sequence_length, hidden_size]
+        c0 = torch.zeros(1, length, 100)
+
+        output, _ = self.lstm(input, (h0, c0))  # [batch_size, sequence_length, hidden_size]
+
+        output = self.fc1(output[:, -1, :])
+
+        return output
 
 
 # Class for creating the neural network.
@@ -88,6 +99,7 @@ def lossFunc():
     will add a sigmoid to the output and calculate the binary
     cross-entropy.
     """
+    return tnn.BCEWithLogitsLoss()
 
 
 def measures(outputs, labels):
