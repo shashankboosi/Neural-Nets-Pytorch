@@ -50,14 +50,27 @@ class NetworkLstm(tnn.Module):
         TODO:
         Create the forward pass through the network.
         """
-        h0 = torch.zeros(1, length, 100)  # [num_of_layers, sequence_length, hidden_size]
-        c0 = torch.zeros(1, length, 100)
+        packed_input = torch.nn.utils.rnn.pack_padded_sequence(input, length.cpu().numpy(), batch_first=True)
+        # h0 = torch.zeros(1, length.size(0), 100)  # [num_of_layers, sequence_length, hidden_size]
+        # c0 = torch.zeros(1, length.size(0), 100)
 
-        output, _ = self.lstm(input, (h0, c0))  # [batch_size, sequence_length, hidden_size]
+        packed_output, (ht, ct) = self.lstm(packed_input)  # [batch_size, sequence_length, hidden_size]
 
-        output = self.fc1(output[:, -1, :])
+        # unpack, recover padded sequence
+        output, _ = torch.nn.utils.rnn.pad_packed_sequence(packed_output, batch_first=True)
+        # print(output.size())
+        # print(input_sizes.size())
+        # last_index = input_sizes - 1
+        # print('last', last_index)
+        # output = torch.gather(output, 1, last_index.view(-1, 1).unsqueeze(2).repeat(1, 1,
+        #                                                                             100)).squeeze()  # [batch_size, hidden_dim]
+        # print('shuffled size', output.size())
+        # print('ht',ht[-1].size())
+        # output = self.fc1(output[:, -1, :])  # [batch_size, hidden_size]
+        output = torch.nn.functional.relu(self.fc1(output[:, -1, :]))
+        output = self.fc2(output)
 
-        return output
+        return output.squeeze()
 
 
 # Class for creating the neural network.
@@ -111,6 +124,13 @@ def measures(outputs, labels):
 
     outputs and labels are torch tensors.
     """
+    torch_divide = outputs / labels
+    true_positive = torch.sum(torch_divide == 1).item()
+    false_positive = torch.sum(torch.isnan(torch_divide)).item()
+    false_negative = torch.sum(torch_divide == torch.from_numpy(np.inf)).item()
+    true_negative = torch.sum(torch_divide == 0).item()
+
+    return true_positive, true_negative, false_positive, false_negative
 
 
 def main():
@@ -139,7 +159,7 @@ def main():
 
     for epoch in range(10):
         running_loss = 0
-
+        print(epoch)
         for i, batch in enumerate(trainLoader):
             # Get a batch and potentially send it to GPU memory.
             inputs, length, labels = textField.vocab.vectors[batch.text[0]].to(device), batch.text[1].to(
@@ -181,7 +201,8 @@ def main():
             labels -= 1
 
             outputs = net(inputs, length)
-
+            print(outputs.size())
+            print(labels.size())
             tp_batch, tn_batch, fp_batch, fn_batch = measures(outputs, labels)
             true_pos += tp_batch
             true_neg += tn_batch
