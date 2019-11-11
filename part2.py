@@ -123,6 +123,13 @@ def measures(outputs, labels):
     outputs and labels are torch tensors.
     """
 
+    torch_divide = outputs / labels
+    true_positive = torch.sum(torch_divide == 1).item()
+    false_positive = torch.sum(torch.isnan(torch_divide)).item()
+    false_negative = torch.sum(torch_divide == torch.from_numpy(np.inf)).item()
+    true_negative = torch.sum(torch_divide == 0).item()
+
+    return true_positive, true_negative, false_positive, false_negative
 
 def main():
     # Use a GPU if available, as it should be faster.
