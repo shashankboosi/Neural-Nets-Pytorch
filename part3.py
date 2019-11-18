@@ -37,6 +37,7 @@ def lossFunc():
     Define a loss function appropriate for the above networks that will
     add a sigmoid to the output and calculate the binary cross-entropy.
     """
+    return tnn.BCEWithLogitsLoss()
 
 def main():
     # Use a GPU if available, as it should be faster.
