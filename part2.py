@@ -158,6 +158,16 @@ def measures(outputs, labels):
     outputs and labels are torch tensors.
     """
 
+    # Convert to numpy
+    outputs = outputs.numpy()
+    labels = labels.numpy()
+
+    true_positive = np.sum(np.logical_and(labels == 1, outputs == 1))
+    false_positive = np.sum(np.logical_and(labels == 0, outputs == 1))
+    false_negative = np.sum(np.logical_and(labels == 1, outputs == 0))
+    true_negative = np.sum(np.logical_and(labels == 0, outputs == 0))
+
+    return true_positive, true_negative, false_positive, false_negative
 
 def main():
     # Use a GPU if available, as it should be faster.
