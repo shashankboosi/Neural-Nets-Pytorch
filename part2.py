@@ -184,7 +184,7 @@ def measures(outputs, labels):
     """
 
     # Convert to numpy
-    outputs = np.round(tnn.Sigmoid().numpy())
+    outputs = np.round(outputs.Sigmoid().numpy())
     labels = labels.numpy()
 
     true_positive = np.sum(np.logical_and(labels == 1, outputs == 1))
