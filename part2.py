@@ -156,10 +156,8 @@ class NetworkCnn(tnn.Module):
         x = torch.relu(self.conv3(x))
         x = self.maxpool3(x)
 
-        x = x.view(-1, 50)
-        x = self.fc1(x)
-        x = x.view(-1)
-        return x
+        x = self.fc1(x.squeeze())
+        return x.squeeze()
 
 def lossFunc():
     """
@@ -184,8 +182,8 @@ def measures(outputs, labels):
     """
 
     # Convert to numpy
-    outputs = np.round(torch.sigmoid(outputs).numpy())
-    labels = labels.numpy()
+    outputs = np.round(torch.sigmoid(outputs).cpu().data.numpy())
+    labels = labels.cpu().data.numpy()
 
     true_positive = np.sum(np.logical_and(labels == 1, outputs == 1))
     false_positive = np.sum(np.logical_and(labels == 0, outputs == 1))
