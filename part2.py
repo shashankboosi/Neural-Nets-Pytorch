@@ -161,7 +161,6 @@ class NetworkCnn(tnn.Module):
         x = x.view(-1)
         return x
 
-
 def lossFunc():
     """
     TODO:
@@ -185,7 +184,7 @@ def measures(outputs, labels):
     """
 
     # Convert to numpy
-    outputs = outputs.numpy()
+    outputs = np.round(tnn.Sigmoid().numpy())
     labels = labels.numpy()
 
     true_positive = np.sum(np.logical_and(labels == 1, outputs == 1))
