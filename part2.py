@@ -129,6 +129,15 @@ class NetworkCnn(tnn.Module):
         TODO:
         Create and initialise weights and biases for the layers.
         """
+        self.conv1 = tnn.Conv1d(in_channels=50, kernel_size=8, padding=5, out_channels=50)
+        self.conv2 = tnn.Conv1d(in_channels=50, kernel_size=8, padding=5, out_channels=50)
+        self.conv3 = tnn.Conv1d(in_channels=50, kernel_size=8, padding=5, out_channels=50)
+
+        self.maxpool1 = tnn.MaxPool1d(4)
+        self.maxpool2 = tnn.MaxPool1d(4)
+        self.maxpool3 = tnn.AdaptiveMaxPool1d(1)
+
+        self.fc1 = tnn.Linear(50, 1)
 
     def forward(self, input, length):
         """
@@ -136,6 +145,21 @@ class NetworkCnn(tnn.Module):
         TODO:
         Create the forward pass through the network.
         """
+        x = input.transpose(1, 2)
+
+        x = tnn.functional.relu(self.conv1(x))
+        x = self.maxpool1(x)
+
+        x = tnn.functional.relu(self.conv2(x))
+        x = self.maxpool2(x)
+
+        x = tnn.functional.relu(self.conv3(x))
+        x = self.maxpool3(x)
+
+        x = x.view(-1, 50)
+        x = self.fc1(x)
+        x = x.view(-1)
+        return x
 
 
 def lossFunc():
@@ -149,6 +173,8 @@ def lossFunc():
 
 
 def measures(outputs, labels):
+    print("outputs ", outputs)
+    print("labels ", labels)
     """
     TODO:
     Return (in the following order): the number of true positive
@@ -188,7 +214,7 @@ def main():
                                                          sort_key=lambda x: len(x.text), sort_within_batch=True)
 
     # Create an instance of the network in memory (potentially GPU memory). Can change to NetworkCnn during development.
-    net = NetworkLstm1().to(device)
+    net = NetworkCnn().to(device)
 
     criterion = lossFunc()
     optimiser = topti.Adam(net.parameters(), lr=0.001)  # Minimise the loss using the Adam algorithm.
@@ -209,7 +235,6 @@ def main():
 
             # Forward pass through the network.
             output = net(inputs, length)
-            print(output.size())
 
             loss = criterion(output, labels)
 
@@ -238,8 +263,7 @@ def main():
             labels -= 1
 
             outputs = net(inputs, length)
-            print(outputs.size())
-            print(labels.size())
+
             tp_batch, tn_batch, fp_batch, fn_batch = measures(outputs, labels)
             true_pos += tp_batch
             true_neg += tn_batch
