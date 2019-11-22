@@ -101,7 +101,7 @@ class NetworkLstm1(tnn.Module):
         output, _ = self.lstm(input, (h0, c0))
 
         # output = self.fc1(output[:, -1, :])  # [batch_size, hidden_size]
-        output = tnn.functional.relu(self.fc1(output[:, -1, :]))
+        output = torch.relu(self.fc1(output[:, -1, :]))
         output = self.fc2(output)
 
         return output
@@ -147,13 +147,13 @@ class NetworkCnn(tnn.Module):
         """
         x = input.transpose(1, 2)
 
-        x = tnn.functional.relu(self.conv1(x))
+        x = torch.relu(self.conv1(x))
         x = self.maxpool1(x)
 
-        x = tnn.functional.relu(self.conv2(x))
+        x = torch.relu(self.conv2(x))
         x = self.maxpool2(x)
 
-        x = tnn.functional.relu(self.conv3(x))
+        x = torch.relu(self.conv3(x))
         x = self.maxpool3(x)
 
         x = x.view(-1, 50)
@@ -184,7 +184,7 @@ def measures(outputs, labels):
     """
 
     # Convert to numpy
-    outputs = np.round(outputs.Sigmoid().numpy())
+    outputs = np.round(torch.sigmoid(outputs).numpy())
     labels = labels.numpy()
 
     true_positive = np.sum(np.logical_and(labels == 1, outputs == 1))
