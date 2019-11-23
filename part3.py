@@ -12,26 +12,30 @@ from imdb_dataloader import IMDB
 class Network(tnn.Module):
     def __init__(self):
         super(Network, self).__init__()
-        self.lstm = tnn.LSTM(input_size=50, hidden_size=100, num_layers=2, batch_first=True, bidirectional=True)
+        self.lstm = tnn.GRU(input_size=50, hidden_size=100, num_layers=3, dropout=0.5, batch_first=True,
+                            bidirectional=True)
         self.fc1 = tnn.Linear(in_features=100 * 2, out_features=64)
         self.fc2 = tnn.Linear(in_features=64, out_features=32)
         self.fc3 = tnn.Linear(in_features=32, out_features=1)
+        self.dropout = tnn.Dropout(0.5)
+        self.relu = tnn.ReLU()
 
     def forward(self, input, length):
         """
         DO NOT MODIFY FUNCTION SIGNATURE
         Create the forward pass through the network.
         """
-        h0 = torch.zeros(2 * 2, length.size(0), 100)  # [num_of_layers, sequence_length, hidden_size]
-        c0 = torch.zeros(2 * 2, length.size(0), 100)
+        output, _ = self.lstm(input)
+        output = self.dropout(output)
 
-        output, _ = self.lstm(input, (h0, c0))
-
-        output = F.relu(self.fc1(output[:, -1, :]))
-        output = F.relu(self.fc2(output))
+        output = self.relu(self.fc1(output[:, -1, :]))
+        output = self.dropout(output)
+        output = self.relu(self.fc2(output))
+        output = self.dropout(output)
         output = self.fc3(output)
 
-        return output
+        return output.squeeze()
+
 
 class PreProcessing():
     def pre(x):
@@ -40,7 +44,7 @@ class PreProcessing():
 
     def post(batch, vocab):
         """Called after numericalization but prior to vectorization"""
-        return batch, vocab
+        return batch
 
     text_field = data.Field(lower=True, include_lengths=True, batch_first=True, preprocessing=pre, postprocessing=post)
 
