@@ -40,71 +40,27 @@ class NetworkLstm(tnn.Module):
         TODO:
         Create and initialise weights and biases for the layers.
         """
-        self.lstm = tnn.LSTM(input_size=50, hidden_size=100, batch_first=True)
+        self.lstm = tnn.LSTM(input_size=50, hidden_size=100, num_layers=1, batch_first=True)
         self.fc1 = tnn.Linear(in_features=100, out_features=64)
         self.fc2 = tnn.Linear(in_features=64, out_features=1)
 
     def forward(self, input, length):
         """
         DO NOT MODIFY FUNCTION SIGNATURE
-        TODO:
         Create the forward pass through the network.
         """
-        packed_input = torch.nn.utils.rnn.pack_padded_sequence(input, length.cpu().numpy(), batch_first=True)
-        # h0 = torch.zeros(1, length.size(0), 100)  # [num_of_layers, sequence_length, hidden_size]
-        # c0 = torch.zeros(1, length.size(0), 100)
+        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-        packed_output, (ht, ct) = self.lstm(packed_input)  # [batch_size, sequence_length, hidden_size]
+        h0 = torch.zeros(1, input.size(0), 100).to(device)
+        c0 = torch.zeros(1, input.size(0), 100).to(device)
 
-        # unpack, recover padded sequence
-        output, _ = torch.nn.utils.rnn.pad_packed_sequence(packed_output, batch_first=True)
-        # last_index = input_sizes - 1
-        # print('last', last_index)
-        # output = torch.gather(output, 1, last_index.view(-1, 1).unsqueeze(2).repeat(1, 1,
-        #                                                                             100)).squeeze()  # [batch_size, hidden_dim]
-        # print('shuffled size', output.size())
-        # print('ht',ht[-1].size())
-        # output = self.fc1(output[:, -1, :])  # [batch_size, hidden_size]
-        output = tnn.functional.relu(self.fc1(output[:, -1, :]))
+        output, (hn, cn) = self.lstm(input, (h0, c0))
+
+        output = torch.nn.functional.relu(self.fc1(output[:, -1, :]))
         output = self.fc2(output)
 
         return output.squeeze()
 
-class NetworkLstm1(tnn.Module):
-    """
-    Implement an LSTM-based network that accepts batched 50-d
-    vectorized inputs, with the following structure:
-    LSTM(hidden dim = 100) -> Linear(64) -> ReLu-> Linear(1)
-    Assume batch-first ordering.
-    Output should be 1d tensor of shape [batch_size].
-    """
-
-    def __init__(self):
-        super(NetworkLstm1, self).__init__()
-        """
-        TODO:
-        Create and initialise weights and biases for the layers.
-        """
-        self.lstm = tnn.LSTM(input_size=50, hidden_size=100, batch_first=True)
-        self.fc1 = tnn.Linear(in_features=100, out_features=64)
-        self.fc2 = tnn.Linear(in_features=64, out_features=1)
-
-    def forward(self, input, length):
-        """
-        DO NOT MODIFY FUNCTION SIGNATURE
-        TODO:
-        Create the forward pass through the network.
-        """
-        h0 = torch.zeros(1, length.size(0), 100)  # [num_of_layers, sequence_length, hidden_size]
-        c0 = torch.zeros(1, length.size(0), 100)
-
-        output, _ = self.lstm(input, (h0, c0))
-
-        # output = self.fc1(output[:, -1, :])  # [batch_size, hidden_size]
-        output = torch.relu(self.fc1(output[:, -1, :]))
-        output = self.fc2(output)
-
-        return output
 
 # Class for creating the neural network.
 class NetworkCnn(tnn.Module):
@@ -145,7 +101,7 @@ class NetworkCnn(tnn.Module):
         TODO:
         Create the forward pass through the network.
         """
-        x = input.transpose(1, 2)
+        x = torch.transpose(input, 1, 2)
 
         x = torch.relu(self.conv1(x))
         x = self.maxpool1(x)
@@ -159,6 +115,7 @@ class NetworkCnn(tnn.Module):
         x = self.fc1(x.squeeze())
         return x.squeeze()
 
+
 def lossFunc():
     """
     TODO:
@@ -170,8 +127,6 @@ def lossFunc():
 
 
 def measures(outputs, labels):
-    print("outputs ", outputs)
-    print("labels ", labels)
     """
     TODO:
     Return (in the following order): the number of true positive
@@ -182,8 +137,8 @@ def measures(outputs, labels):
     """
 
     # Convert to numpy
-    outputs = np.round(torch.sigmoid(outputs).cpu().data.numpy())
-    labels = labels.cpu().data.numpy()
+    outputs = np.round(torch.sigmoid(outputs).cpu().numpy())
+    labels = labels.cpu().numpy()
 
     true_positive = np.sum(np.logical_and(labels == 1, outputs == 1))
     false_positive = np.sum(np.logical_and(labels == 0, outputs == 1))
@@ -191,6 +146,7 @@ def measures(outputs, labels):
     true_negative = np.sum(np.logical_and(labels == 0, outputs == 0))
 
     return true_positive, true_negative, false_positive, false_negative
+
 
 def main():
     # Use a GPU if available, as it should be faster.
@@ -211,14 +167,14 @@ def main():
                                                          sort_key=lambda x: len(x.text), sort_within_batch=True)
 
     # Create an instance of the network in memory (potentially GPU memory). Can change to NetworkCnn during development.
-    net = NetworkCnn().to(device)
+    net = NetworkLstm().to(device)
 
     criterion = lossFunc()
     optimiser = topti.Adam(net.parameters(), lr=0.001)  # Minimise the loss using the Adam algorithm.
 
     for epoch in range(10):
         running_loss = 0
-        print(epoch)
+
         for i, batch in enumerate(trainLoader):
             # Get a batch and potentially send it to GPU memory.
             inputs, length, labels = textField.vocab.vectors[batch.text[0]].to(device), batch.text[1].to(
