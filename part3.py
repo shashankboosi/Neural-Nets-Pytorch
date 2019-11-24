@@ -12,41 +12,45 @@ from imdb_dataloader import IMDB
 class Network(tnn.Module):
     def __init__(self):
         super(Network, self).__init__()
-        self.lstm = tnn.GRU(input_size=50, hidden_size=100, num_layers=3, dropout=0.5, batch_first=True,
-                            bidirectional=True)
+        self.gru = tnn.GRU(input_size=50, hidden_size=100, num_layers=3, dropout=0.5, bias=True, batch_first=True,
+                           bidirectional=True)
         self.fc1 = tnn.Linear(in_features=100 * 2, out_features=64)
-        self.fc2 = tnn.Linear(in_features=64, out_features=32)
-        self.fc3 = tnn.Linear(in_features=32, out_features=1)
-        self.dropout = tnn.Dropout(0.5)
-        self.relu = tnn.ReLU()
+        self.fc2 = tnn.Linear(in_features=64, out_features=1)
 
     def forward(self, input, length):
         """
         DO NOT MODIFY FUNCTION SIGNATURE
         Create the forward pass through the network.
         """
-        output, _ = self.lstm(input)
-        output = self.dropout(output)
+        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-        output = self.relu(self.fc1(output[:, -1, :]))
-        output = self.dropout(output)
-        output = self.relu(self.fc2(output))
-        output = self.dropout(output)
-        output = self.fc3(output)
+        h0 = torch.zeros(3 * 2, input.size(0), 100).to(device)
+
+        output, hn = self.gru(input, h0)
+
+        output = F.relu(self.fc1(output[:, -1, :]))
+        output = self.fc2(output)
 
         return output.squeeze()
 
 
 class PreProcessing():
+    stop_words_list = ["a", "an", "the"]
+
     def pre(x):
         """Called after tokenization"""
-        return x
+        punctuations_list = ["!", "#", "$", "'", "%", "&", "(", ")", "*", "+", ",", "-", ".", "/", ":", ";", "<", "=",
+                             ">", "?", "@", "[", "]", "^", "_", "`", "{", "|", "}", "~"]
+
+        cleaned_tokens = [''.join(letter for letter in tokens if letter not in punctuations_list) for tokens in x]
+        return [not_empty for not_empty in cleaned_tokens if not_empty]
 
     def post(batch, vocab):
         """Called after numericalization but prior to vectorization"""
         return batch
 
-    text_field = data.Field(lower=True, include_lengths=True, batch_first=True, preprocessing=pre, postprocessing=post)
+    text_field = data.Field(lower=True, stop_words=stop_words_list, include_lengths=True, batch_first=True,
+                            preprocessing=pre, postprocessing=post)
 
 
 def lossFunc():
@@ -55,6 +59,7 @@ def lossFunc():
     add a sigmoid to the output and calculate the binary cross-entropy.
     """
     return tnn.BCEWithLogitsLoss()
+
 
 def main():
     # Use a GPU if available, as it should be faster.
@@ -74,7 +79,7 @@ def main():
                                                          sort_key=lambda x: len(x.text), sort_within_batch=True)
 
     net = Network().to(device)
-    criterion =lossFunc()
+    criterion = lossFunc()
     optimiser = topti.Adam(net.parameters(), lr=0.001)  # Minimise the loss using the Adam algorithm.
 
     for epoch in range(10):
@@ -133,6 +138,7 @@ def main():
     accuracy = 100 * num_correct / len(dev)
 
     print(f"Classification accuracy: {accuracy}")
+
 
 if __name__ == '__main__':
     main()
