@@ -1,15 +1,6 @@
 #!/usr/bin/env python3
 """
-part1.py
-
-UNSW COMP9444 Neural Networks and Deep Learning
-
-ONLY COMPLETE METHODS AND CLASSES MARKED "TODO".
-
-DO NOT MODIFY IMPORTS. DO NOT ADD EXTRA FUNCTIONS.
-DO NOT MODIFY EXISTING FUNCTION SIGNATURES.
-DO NOT IMPORT ADDITIONAL LIBRARIES.
-DOING SO MAY CAUSE YOUR CODE TO FAIL AUTOMATED TESTING.
+Helper functions for RNN, LSTM
 """
 
 import torch
@@ -25,10 +16,8 @@ class rnn(torch.nn.Module):
 
     def rnnCell(self, input, hidden):
         """
-        TODO: Using only the above defined linear layers and a tanh
-              activation, create an Elman RNN cell.  You do not need
-              to include an output layer.  The network should take
-              some input (inputDim = 64) and the current hidden state
+        Create an Elman RNN cell. The network should takes
+              input (inputDim = 64) and the current hidden state
               (hiddenDim = 128), and return the new hidden state.
         """
         tanh_input = self.ih(input) + self.hh(hidden)
@@ -37,11 +26,11 @@ class rnn(torch.nn.Module):
     def forward(self, input):
         hidden = torch.zeros(128)
         """
-        TODO: Using self.rnnCell, create a model that takes as input
+        Create a model that takes as input
               a sequence of size [seqLength, batchSize, inputDim]
               and passes each input through the rnn sequentially,
               updating the (initally zero) hidden state.
-              Return the final hidden state after the
+              Returns the final hidden state after the
               last input in the sequence has been processed.
         """
         for e in input:
@@ -54,7 +43,7 @@ class rnnSimplified(torch.nn.Module):
     def __init__(self):
         super(rnnSimplified, self).__init__()
         """
-        TODO: Define self.net using a single PyTorch module such that
+        PyTorch module such that
               the network defined by this class is equivalent to the
               one defined in class "rnn".
         """
@@ -68,8 +57,7 @@ class rnnSimplified(torch.nn.Module):
 
 def lstm(input, hiddenSize):
     """
-    TODO: Let variable lstm be an instance of torch.nn.LSTM.
-          Variable input is of size [batchSize, seqLength, inputDim]
+    Variable input is of size [batchSize, seqLength, inputDim]
     """
     lstm = torch.nn.LSTM(input_size=input.size(2), hidden_size=hiddenSize, batch_first=True)
     return lstm(input)
@@ -77,9 +65,9 @@ def lstm(input, hiddenSize):
 
 def conv(input, weight):
     """
-    TODO: Return the convolution of input and weight tensors,
+    Returns the convolution of input and weight tensors,
           where input contains sequential data.
-          The convolution should be along the sequence axis.
+          The convolution is along the sequence axis.
           input is of size [batchSize, inputDim, seqLength]
     """
     output = torch.nn.functional.conv1d(input=input, weight=weight)
