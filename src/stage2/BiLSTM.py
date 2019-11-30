@@ -1,11 +1,10 @@
-import numpy as np
 import torch
 import torch.nn as tnn
 import torch.nn.functional as F
 import torch.optim as topti
 from torchtext import data
 from torchtext.vocab import GloVe
-from imdb_dataloader import IMDB
+from data.imdb_dataloader import IMDB
 
 
 # Class for creating the neural network.
@@ -18,10 +17,7 @@ class Network(tnn.Module):
         self.fc2 = tnn.Linear(in_features=64, out_features=1)
 
     def forward(self, input, length):
-        """
-        DO NOT MODIFY FUNCTION SIGNATURE
-        Create the forward pass through the network.
-        """
+
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
         h0 = torch.zeros(3 * 2, input.size(0), 100).to(device)
@@ -54,10 +50,6 @@ class PreProcessing():
 
 
 def lossFunc():
-    """
-    Define a loss function appropriate for the above networks that will
-    add a sigmoid to the output and calculate the binary cross-entropy.
-    """
     return tnn.BCEWithLogitsLoss()
 
 
@@ -80,7 +72,7 @@ def main():
 
     net = Network().to(device)
     criterion = lossFunc()
-    optimiser = topti.Adam(net.parameters(), lr=0.001)  # Minimise the loss using the Adam algorithm.
+    optimiser = topti.Adam(net.parameters(), lr=0.001)
 
     for epoch in range(10):
         running_loss = 0
@@ -92,8 +84,6 @@ def main():
 
             labels -= 1
 
-            # PyTorch calculates gradients by accumulating contributions to them (useful for
-            # RNNs).  Hence we must manually set them to zero before calculating them.
             optimiser.zero_grad()
 
             # Forward pass through the network.
@@ -116,11 +106,9 @@ def main():
     num_correct = 0
 
     # Save mode
-    torch.save(net.state_dict(), "./model.pth")
+    torch.save(net.state_dict(), "./model/model.pth")
     print("Saved model")
 
-    # Evaluate network on the test dataset.  We aren't calculating gradients, so disable autograd to speed up
-    # computations and reduce memory usage.
     with torch.no_grad():
         for batch in testLoader:
             # Get a batch and potentially send it to GPU memory.

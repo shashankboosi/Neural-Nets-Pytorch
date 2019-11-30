@@ -1,17 +1,6 @@
 #!/usr/bin/env python3
 """
-part2.py
-
-UNSW COMP9444 Neural Networks and Deep Learning
-
-ONLY COMPLETE METHODS AND CLASSES MARKED "TODO".
-
-DO NOT MODIFY IMPORTS. DO NOT ADD EXTRA FUNCTIONS.
-DO NOT MODIFY EXISTING FUNCTION SIGNATURES.
-DO NOT IMPORT ADDITIONAL LIBRARIES.
-DOING SO MAY CAUSE YOUR CODE TO FAIL AUTOMATED TESTING.
-
-YOU MAY MODIFY THE LINE net = NetworkLstm().to(device)
+rnn_cnn_imdb.py
 """
 
 import numpy as np
@@ -26,29 +15,15 @@ from torchtext.vocab import GloVe
 
 # Class for creating the neural network.
 class NetworkLstm(tnn.Module):
-    """
-    Implement an LSTM-based network that accepts batched 50-d
-    vectorized inputs, with the following structure:
-    LSTM(hidden dim = 100) -> Linear(64) -> ReLu-> Linear(1)
-    Assume batch-first ordering.
-    Output should be 1d tensor of shape [batch_size].
-    """
 
     def __init__(self):
         super(NetworkLstm, self).__init__()
-        """
-        TODO:
-        Create and initialise weights and biases for the layers.
-        """
+
         self.lstm = tnn.LSTM(input_size=50, hidden_size=100, num_layers=1, batch_first=True)
         self.fc1 = tnn.Linear(in_features=100, out_features=64)
         self.fc2 = tnn.Linear(in_features=64, out_features=1)
 
     def forward(self, input, length):
-        """
-        DO NOT MODIFY FUNCTION SIGNATURE
-        Create the forward pass through the network.
-        """
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
         h0 = torch.zeros(1, input.size(0), 100).to(device)
@@ -64,20 +39,6 @@ class NetworkLstm(tnn.Module):
 
 # Class for creating the neural network.
 class NetworkCnn(tnn.Module):
-    """
-    Implement a Convolutional Neural Network.
-    All conv layers should be of the form:
-    conv1d(channels=50, kernel size=8, padding=5)
-
-    Conv -> ReLu -> maxpool(size=4) -> Conv -> ReLu -> maxpool(size=4) ->
-    Conv -> ReLu -> maxpool over time (global pooling) -> Linear(1)
-
-    The max pool over time operation refers to taking the
-    maximum val from the entire output channel. See Kim et. al. 2014:
-    https://www.aclweb.org/anthology/D14-1181/
-    Assume batch-first ordering.
-    Output should be 1d tensor of shape [batch_size].
-    """
 
     def __init__(self):
         super(NetworkCnn, self).__init__()
@@ -96,11 +57,6 @@ class NetworkCnn(tnn.Module):
         self.fc1 = tnn.Linear(50, 1)
 
     def forward(self, input, length):
-        """
-        DO NOT MODIFY FUNCTION SIGNATURE
-        TODO:
-        Create the forward pass through the network.
-        """
         x = torch.transpose(input, 1, 2)
 
         x = torch.relu(self.conv1(x))
@@ -117,25 +73,10 @@ class NetworkCnn(tnn.Module):
 
 
 def lossFunc():
-    """
-    TODO:
-    Return a loss function appropriate for the above networks that
-    will add a sigmoid to the output and calculate the binary
-    cross-entropy.
-    """
     return tnn.BCEWithLogitsLoss()
 
 
 def measures(outputs, labels):
-    """
-    TODO:
-    Return (in the following order): the number of true positive
-    classifications, true negatives, false positives and false
-    negatives from the given batch outputs and provided labels.
-
-    outputs and labels are torch tensors.
-    """
-
     # Convert to numpy
     outputs = np.round(torch.sigmoid(outputs).cpu().numpy())
     labels = labels.cpu().numpy()
@@ -153,11 +94,10 @@ def main():
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     print("Using device: " + str(device))
 
-    # Load the training dataset, and create a data loader to generate a batch.
     textField = data.Field(lower=True, include_lengths=True, batch_first=True)
     labelField = data.Field(sequential=False)
 
-    from imdb_dataloader import IMDB
+    from data.imdb_dataloader import IMDB
     train, dev = IMDB.splits(textField, labelField, train="train", validation="dev")
 
     textField.build_vocab(train, dev, vectors=GloVe(name="6B", dim=50))
@@ -181,9 +121,6 @@ def main():
                 device), batch.label.type(torch.FloatTensor).to(device)
 
             labels -= 1
-
-            # PyTorch calculates gradients by accumulating contributions to them (useful for
-            # RNNs).  Hence we must manually set them to zero before calculating them.
             optimiser.zero_grad()
 
             # Forward pass through the network.
@@ -209,7 +146,6 @@ def main():
     # computations and reduce memory usage.
     with torch.no_grad():
         for batch in testLoader:
-            # Get a batch and potentially send it to GPU memory.
             inputs, length, labels = textField.vocab.vectors[batch.text[0]].to(device), batch.text[1].to(
                 device), batch.label.type(torch.FloatTensor).to(device)
 

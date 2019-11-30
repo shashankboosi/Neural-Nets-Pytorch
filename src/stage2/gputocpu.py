@@ -1,6 +1,6 @@
 # convert.py
 import torch
-from part3 import Network, PreProcessing
+from src.stage2.BiLSTM import Network
 
 device = torch.device('cpu')
 net = Network().to(device)

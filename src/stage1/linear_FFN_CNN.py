@@ -70,11 +70,11 @@ class NNModel:
                                         transforms.Normalize((0.5,), (0.5,))])
 
         # Download and load the training data
-        trainset = datasets.KMNIST(root='../data', train=True, download=True, transform=transform)
+        trainset = datasets.KMNIST(root='../../data', train=True, download=True, transform=transform)
         self.trainloader = torch.utils.data.DataLoader(trainset, batch_size=64, shuffle=False)
 
         # Download and load the test data
-        testset = datasets.KMNIST(root='../data', train=False, download=True, transform=transform)
+        testset = datasets.KMNIST(root='../../data', train=False, download=True, transform=transform)
         self.testloader = torch.utils.data.DataLoader(testset, batch_size=64, shuffle=False)
 
         self.model = network
@@ -147,7 +147,7 @@ def plot_result(results, names):
     plt.ylabel("Test accuracy")
     plt.grid(True)
     plt.tight_layout()
-    plt.savefig("../Images/epoch_to_accuracy.png")
+    plt.savefig("../../Images/epoch_to_accuracy.png")
     plt.show()
 
 

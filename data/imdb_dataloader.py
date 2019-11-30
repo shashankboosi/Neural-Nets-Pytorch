@@ -7,6 +7,11 @@ import os
 import glob
 import io
 
+'''
+Code provided to get the IMDB dataset required for the functions
+rnn_cnn_imdb.py, BiLSTM.py
+'''
+
 from torchtext import data
 
 class IMDB(data.Dataset):
@@ -26,7 +31,7 @@ class IMDB(data.Dataset):
         super(IMDB, self).__init__(examples, fields, **kwargs)
 
     @classmethod
-    def splits(cls, text_field, label_field, root='data',
+    def splits(cls, text_field, label_field, root='data_imdb',
                train=None, test=None, validation=None, **kwargs):
         return super(IMDB, cls).splits(
             root=root, text_field=text_field, label_field=label_field,
