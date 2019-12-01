@@ -92,7 +92,7 @@ venv.bak/
 
 # IntelliJ
 .idea/
-.DS_Store
+.DS_Store/
 data/KMNIST/
 data/imdb/
 .vector_cache/
