@@ -98,7 +98,7 @@ class LinearModel:
 
 
 def main():
-    inputs, labels = pkl.load(open("../data/binary_classification_data.pkl", "rb"))
+    inputs, labels = pkl.load(open("../../data/binary_classification_data.pkl", "rb"))
 
     epochs = 400
     model = LinearModel(num_inputs=inputs.shape[1], learning_rate=0.01)

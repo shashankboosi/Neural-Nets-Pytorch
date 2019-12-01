@@ -92,7 +92,11 @@ venv.bak/
 
 # IntelliJ
 .idea/
+.DS_Store/
 data/KMNIST/
+data/imdb/
+.vector_cache/
+src/stage2/.vector_cache/
 
 # Spyder project settings
 .spyderproject

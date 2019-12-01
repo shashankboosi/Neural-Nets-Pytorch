@@ -1,6 +1,6 @@
-# Neural-Nets
+# Neural-Nets-Pytorch
 
-This repo consists of deep learning models using PyTorch
+This repo consists of deep learning models using PyTorch.
 
 ### Installations for the repo
 
@@ -13,4 +13,28 @@ Command to install `pytorch` in your environment
 
 > conda install pytorch torchvision cpuonly -c pytorch
 
-For all the packages used for the project, kindly look at the requirements.txt file
+For all the packages used for the project, kindly install them using the command 
+ 
+> pip install requirements.txt
+
+
+### Implementation
+
+The implementation is divide into 2 stages
+
+1) Stage 1:
+
+This stage consists of code for learnig pytorch, implementing perceptron using numpy and our first pytorch model
+for KMNIST dataset.
+
+2) Stage 2:
+
+Stage 2 consists of code relating to RNNs where implementation of LSTM, BiGRU is done on a
+ sample of the whole IMDB dataset.
+ 
+ > All the datasets should be stored in the data directory for the codes to run successfully.
+
+## Acknowledgement
+
+I would like to thank Alan Blair and his team for supporting us with the materials and the templates 
+required to learn pytorch in this repository as part of the course.
