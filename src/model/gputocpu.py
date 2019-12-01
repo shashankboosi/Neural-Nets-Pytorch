@@ -1,6 +1,6 @@
-# convert.py
+# Convert the model.pth which was run on a gpu to run in a cpu environment
 import torch
-from src.stage2.BiLSTM import Network
+from src.stage2.BiGRU import Network
 
 device = torch.device('cpu')
 net = Network().to(device)

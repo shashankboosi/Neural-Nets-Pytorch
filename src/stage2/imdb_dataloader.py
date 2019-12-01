@@ -1,6 +1,5 @@
 """
-DO NOT MODIFY
-Dataloder for parts 2 and 3
+Dataloader for rnn_cnn_imdb and BiGRU
 We will also call this file when loading test data
 """
 import os
@@ -9,10 +8,11 @@ import io
 
 '''
 Code provided to get the IMDB dataset required for the functions
-rnn_cnn_imdb.py, BiLSTM.py
+rnn_cnn_imdb.py, BiGRU.py
 '''
 
 from torchtext import data
+
 
 class IMDB(data.Dataset):
     name = 'imdb'
@@ -31,7 +31,7 @@ class IMDB(data.Dataset):
         super(IMDB, self).__init__(examples, fields, **kwargs)
 
     @classmethod
-    def splits(cls, text_field, label_field, root='data_imdb',
+    def splits(cls, text_field, label_field, root='../../data',
                train=None, test=None, validation=None, **kwargs):
         return super(IMDB, cls).splits(
             root=root, text_field=text_field, label_field=label_field,

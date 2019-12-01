@@ -11,7 +11,7 @@ import torch.optim as topti
 
 from torchtext import data
 from torchtext.vocab import GloVe
-
+from src.stage2.imdb_dataloader import IMDB
 
 # Class for creating the neural network.
 class NetworkLstm(tnn.Module):
@@ -97,7 +97,6 @@ def main():
     textField = data.Field(lower=True, include_lengths=True, batch_first=True)
     labelField = data.Field(sequential=False)
 
-    from data.imdb_dataloader import IMDB
     train, dev = IMDB.splits(textField, labelField, train="train", validation="dev")
 
     textField.build_vocab(train, dev, vectors=GloVe(name="6B", dim=50))
@@ -107,7 +106,7 @@ def main():
                                                          sort_key=lambda x: len(x.text), sort_within_batch=True)
 
     # Create an instance of the network in memory (potentially GPU memory). Can change to NetworkCnn during development.
-    net = NetworkLstm().to(device)
+    net = NetworkCnn().to(device)
 
     criterion = lossFunc()
     optimiser = topti.Adam(net.parameters(), lr=0.001)  # Minimise the loss using the Adam algorithm.

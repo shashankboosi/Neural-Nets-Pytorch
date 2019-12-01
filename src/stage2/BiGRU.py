@@ -4,7 +4,7 @@ import torch.nn.functional as F
 import torch.optim as topti
 from torchtext import data
 from torchtext.vocab import GloVe
-from data.imdb_dataloader import IMDB
+from src.stage2.imdb_dataloader import IMDB
 
 
 # Class for creating the neural network.
@@ -106,7 +106,7 @@ def main():
     num_correct = 0
 
     # Save mode
-    torch.save(net.state_dict(), "./model/model.pth")
+    torch.save(net.state_dict(), "../model/model.pth")
     print("Saved model")
 
     with torch.no_grad():
